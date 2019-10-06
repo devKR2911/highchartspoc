@@ -3,10 +3,12 @@ import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { StackedBarGraphComponent } from './stacked-bar-graph/stacked-bar-graph.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    StackedBarGraphComponent
   ],
   imports: [
     BrowserModule,
