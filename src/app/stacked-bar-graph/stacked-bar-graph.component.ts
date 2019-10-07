@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 
 import * as Highcharts from 'highcharts';
 
+import graphdata from './data.json';
+
 declare var require: any;
 const Boost = require('highcharts/modules/boost');
 const noData = require('highcharts/modules/no-data-to-display');
@@ -18,78 +20,125 @@ noData(Highcharts);
   styleUrls: ['./stacked-bar-graph.component.scss']
 })
 export class StackedBarGraphComponent implements OnInit {
+  constructor() {}
+  public itemsPerScreen = { id: 0, value: 5 };
+
+  public graphOptions = [
+    { id: 0, value: 5 },
+    { id: 1, value: 10 },
+    { id: 2, value: 15 }
+  ];
+
   public options: any = {
-    title: {
-      text: 'Solar Employment Growth by Sector, 2010-2016'
+    chart: {
+      type: 'column',
+      plotBorderColor: '#e6e6e6',
+      plotBorderWidth: 1
     },
 
-    subtitle: {
-      text: 'Source: thesolarfoundation.com'
+    title: {
+      text: '7. Pension Plan'
+    },
+
+    xAxis: {
+      tickWidth: 1,
+      tickmarkPlacement: 'on',
+      gridLineWidth: 1,
+      lineColor: 'transparent',
+      title: {
+        text: 'Aika'
+      },
+      offset: 20,
+      categories: [],
+      labels: {
+        formatter: function() {
+          let ret = this.value,
+            len = ret.length;
+          if (len > 6) {
+            ret = ret.slice(0, 6) + '<br/>' + ret.slice(6, len);
+          }
+
+          if (len > 25) {
+            ret = ret.slice(0, 25) + '...';
+          }
+          return ret;
+        },
+        y: 25
+      }
     },
 
     yAxis: {
+      allowDecimals: false,
+      min: 0,
+      tickWidth: 1,
+      gridLineWidth: 1,
       title: {
-        text: 'Number of Employees'
+        text: 'Euroa'
+      },
+      labels: {
+        formatter: function() {
+          return this.value;
+        }
       }
     },
-    legend: {
-      layout: 'vertical',
-      align: 'right',
-      verticalAlign: 'middle'
+
+    tooltip: {
+      formatter: function() {
+        return (
+          '<b>' +
+          this.x +
+          '</b><br/>' +
+          this.series.name +
+          ': ' +
+          this.y +
+          '<br/>' +
+          'Total: ' +
+          this.point.stackTotal
+        );
+      }
     },
 
     plotOptions: {
-      series: {
-        label: {
-          connectorAllowed: false
-        },
-        pointStart: 2010
+      column: {
+        stacking: 'normal',
+        pointPadding: 0,
+        borderWidth: 0
       }
     },
 
-    series: [
-      {
-        name: 'Installation',
-        data: [43934, 52503, 57177, 69658, 97031, 119931, 137133, 154175]
-      },
-      {
-        name: 'Manufacturing',
-        data: [24916, 24064, 29742, 29851, 32490, 30282, 38121, 40434]
-      },
-      {
-        name: 'Sales & Distribution',
-        data: [11744, 17722, 16005, 19771, 20185, 24377, 32147, 39387]
-      },
-      {
-        name: 'Project Development',
-        data: [null, null, 7988, 12169, 15112, 22452, 34400, 34227]
-      },
-      {
-        name: 'Other',
-        data: [12908, 5948, 8105, 11248, 8989, 11816, 18274, 18111]
-      }
-    ],
-
-    responsive: {
-      rules: [
-        {
-          condition: {
-            maxWidth: 500
-          },
-          chartOptions: {
-            legend: {
-              layout: 'horizontal',
-              align: 'center',
-              verticalAlign: 'bottom'
-            }
-          }
-        }
-      ]
-    }
+    series: []
   };
-  constructor() {}
+
+  public onChange = function() {
+    console.log(this.itemsPerScreen);
+    // this.parseData();
+    // this.rebindGraph();
+  };
+
+  public parseData = function() {
+    const categories = [];
+    const pensionData = { name: 'Pension', data: [], color: '#ff5622' };
+    const salaryData = { name: 'Salary', data: [], color: '#9013fe' };
+    const extraPensionData = {
+      name: 'Extra Pension',
+      data: [],
+      color: '#feab00'
+    };
+    graphdata.forEach(item => {
+      categories.push(item.date);
+      pensionData.data.push(item.value.Pension);
+      salaryData.data.push(item.value.Salary);
+      extraPensionData.data.push(item.value.ExtraPension);
+    });
+    const series = [pensionData, salaryData, extraPensionData];
+    this.options.series = series;
+    this.options.xAxis.categories = categories;
+  };
+
+  public rebindGraph = function() {};
 
   ngOnInit() {
+    this.parseData();
     Highcharts.chart('container', this.options);
   }
 }
