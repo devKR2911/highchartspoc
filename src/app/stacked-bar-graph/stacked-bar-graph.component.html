@@ -1,9 +1,16 @@
 <div>
   <div>
-    <select [(ngModel)]="itemsPerScreen" (ngModelChange)="onChange($event)">
-      <option *ngFor="let option of graphOptions" [ngValue]="option">{{option.value}}</option>
+    <button *ngFor="let item of buttonArray" (click)="onPagination(item)">
+      {{ item + 1 }}
+    </button>
+  </div>
+  <div>
+    <select [(ngModel)]="itemsPerScreen" (ngModelChange)="onChange(true)">
+      <option *ngFor="let option of graphOptions" [ngValue]="option">{{
+        option.value
+      }}</option>
     </select>
-    {{itemsPerScreen.value}}
+    {{ itemsPerScreen.value }}
   </div>
   <div id="container"></div>
 </div>
